@@ -1,75 +1,179 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>庫存統計</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f5f6f8;color:#1f2937;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif}
-.wrap{max-width:460px;margin:auto;padding:10px 8px 28px}
-h1{font-size:21px;margin:6px 0 12px}
+body{
+ margin:0;background:#f5f6f8;color:#1f2937;
+ font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif
+}
+.wrap{max-width:460px;margin:auto;padding:9px 7px 28px}
+h1{font-size:21px;margin:6px 0 10px}
 h2{font-size:16px;margin:0 0 10px}
-.card{background:white;border:1px solid #e5e7eb;border-radius:12px;padding:11px;margin-bottom:9px}
+.card{
+ background:white;border:1px solid #e5e7eb;
+ border-radius:12px;padding:10px;margin-bottom:9px
+}
 .actions{display:flex;gap:7px;margin-bottom:10px}
-button{border:0;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer}
+button{
+ border:0;border-radius:8px;padding:9px 12px;
+ font-size:13px;font-weight:700;cursor:pointer
+}
 .primary{background:#2563eb;color:white}
 .secondary{background:#e9eef5;color:#334155}
 .danger{background:#fee2e2;color:#b91c1c}
-.note{font-size:11px;color:#64748b;line-height:1.5;margin:5px 0 10px}
-input[type=number]{width:100%;height:36px;border:1px solid #cbd5e1;border-radius:7px;text-align:center;font-size:15px;background:white;color:#111827}
-input:focus,select:focus{outline:2px solid #bfdbfe;border-color:#2563eb}
-.bucket-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.bucket{position:relative;aspect-ratio:1/1;border:1.5px solid #cbd5e1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#f8fafc;min-width:0}
-.bucket .num{position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:9px;color:#64748b}
-.bucket .name{font-size:10px;font-weight:700;text-align:center;line-height:1.1;overflow-wrap:anywhere;margin-top:7px}
-.bucket input{width:75%;height:23px;font-size:12px;padding:0;border-radius:5px}
-.bucket.empty{border:2px dashed #94a3b8;background:white;cursor:pointer}
-.bucket .plus{font-size:24px;color:#2563eb;font-weight:400}
+.note{font-size:11px;color:#64748b;line-height:1.5;margin:7px 0}
+input[type=number]{
+ width:100%;height:35px;border:1px solid #cbd5e1;
+ border-radius:7px;text-align:center;font-size:15px;
+ background:white;color:#111827
+}
+input:focus,select:focus{
+ outline:2px solid #bfdbfe;border-color:#2563eb
+}
+.bucket-grid{
+ display:grid;
+ grid-template-columns:repeat(7,minmax(0,1fr));
+ gap:5px 3px
+}
+.bucket{
+ position:relative;aspect-ratio:1/1;min-width:0;
+ border:1.5px solid #cbd5e1;border-radius:50%;
+ display:flex;flex-direction:column;align-items:center;
+ justify-content:center;gap:2px;
+ background:#f8fafc;padding:2px
+}
+.bucket .name{
+ font-size:10px;font-weight:800;text-align:center;
+ line-height:1.1;overflow-wrap:anywhere
+}
+.bucket input{
+ width:82%;height:22px;font-size:12px;
+ padding:0;border-radius:5px
+}
+.bucket.empty{
+ border:2px dashed #94a3b8;
+ background:white;cursor:pointer
+}
+.bucket .plus{font-size:24px;color:#2563eb}
 .bucket .count{font-size:9px;color:#64748b}
-.bucket .remove{position:absolute;top:-5px;right:-4px;width:19px;height:19px;min-height:0;padding:0;border-radius:50%;background:#fecaca;color:#991b1b;font-size:14px}
+.bucket .remove{
+ position:absolute;top:-5px;right:-4px;
+ width:19px;height:19px;min-height:0;padding:0;
+ border-radius:50%;background:#fecaca;
+ color:#991b1b;font-size:14px
+}
 .bucket.fixed{background:#f1f5f9}
-.bucket.tricolor{background:#eff6ff;border-color:#93c5fd}
-.bucket.filled{background:#ecfdf5;border-color:#86efac}
-.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.bucket.tricolor{
+ background:#fff7ed;border-color:#f59e0b
+}
+.bucket.filled{
+ background:#ecfdf5;border-color:#86efac
+}
+.modal{
+ position:fixed;inset:0;background:#0008;
+ display:none;align-items:center;justify-content:center;
+ padding:18px;z-index:50
+}
 .modal.open{display:flex}
-.dialog{background:white;width:100%;max-width:350px;border-radius:14px;padding:18px}
+.dialog{
+ background:white;width:100%;max-width:350px;
+ border-radius:14px;padding:18px
+}
 .dialog h3{margin:0 0 14px;font-size:17px}
-.dialog select{width:100%;height:42px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;margin-bottom:14px}
+.dialog select{
+ width:100%;height:42px;border:1px solid #cbd5e1;
+ border-radius:8px;font-size:16px;margin-bottom:14px
+}
 .dialog .actions{justify-content:flex-end;margin:0}
-.pudding{background:#f8fafc;border-radius:9px;padding:9px;margin-bottom:8px}
-.pudding-top{display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:8px}
-.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.field{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700}
-.compact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.compact{background:#f8fafc;padding:7px 5px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:6px}
+.pudding{
+ background:#f8fafc;border-radius:9px;
+ padding:9px;margin-bottom:8px
+}
+.pudding-top{
+ display:flex;justify-content:space-between;
+ font-weight:700;font-size:13px;margin-bottom:8px
+}
+.fields{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px
+}
+.field{
+ display:flex;flex-direction:column;gap:5px;
+ font-size:12px;font-weight:700
+}
+.compact-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:6px
+}
+.compact{
+ background:#f8fafc;padding:7px 5px;border-radius:8px;
+ text-align:center;font-size:12px;font-weight:700;
+ display:flex;flex-direction:column;gap:6px
+}
 .compact input{height:32px}
-.two-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.two-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px
+}
 .stove{display:flex;gap:8px}
-.stove label{flex:1;display:flex;gap:7px;align-items:center;justify-content:center;background:#f1f5f9;border-radius:8px;padding:11px;font-size:13px;font-weight:700}
-.temp-row{display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #eef2f7;padding:9px 0}
+.stove label{
+ flex:1;display:flex;gap:7px;align-items:center;
+ justify-content:center;background:#f1f5f9;
+ border-radius:8px;padding:11px;
+ font-size:13px;font-weight:700
+}
+.check-row{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:8px;padding:9px 0;border-bottom:1px solid #eef2f7
+}
+.check-row:last-child{border-bottom:0}
+.check-btn{
+ min-width:85px;background:#e2e8f0;color:#475569
+}
+.check-btn.yes{background:#dcfce7;color:#166534}
+.temp-row{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:8px;border-bottom:1px solid #eef2f7;padding:9px 0
+}
 .temp-row:last-child{border-bottom:0}
 .temp-name{font-size:13px;font-weight:700}
-.temp-note{font-size:10px;color:#64748b;line-height:1.4;margin-top:2px}
-.temp-right{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.temp-note{
+ font-size:10px;color:#64748b;line-height:1.4;margin-top:2px
+}
+.temp-right{
+ display:flex;align-items:center;gap:3px;flex-shrink:0
+}
 .temp-right input{width:65px;height:34px}
-.total-row{display:flex;justify-content:space-between;padding:5px 2px;border-bottom:1px solid #f1f5f9;font-size:13px}
+.total-row{
+ display:flex;justify-content:space-between;
+ padding:5px 2px;border-bottom:1px solid #f1f5f9;
+ font-size:13px
+}
 .total-row strong{font-size:15px}
-.message{font-size:12px;color:#047857;min-height:18px;margin:6px 0}
+.message{
+ font-size:12px;color:#047857;
+ min-height:18px;margin:6px 0
+}
 @media(max-width:370px){
-.wrap{padding-left:5px;padding-right:5px}
-.card{padding:8px}
-.bucket-grid{gap:3px}
-.bucket .name{font-size:9px}
-.bucket .num{font-size:8px;top:3px}
-.bucket input{height:21px;font-size:11px}
+ .wrap{padding-left:4px;padding-right:4px}
+ .card{padding:7px}
+ .bucket-grid{gap:3px 2px}
+ .bucket .name{font-size:9px}
+ .bucket input{height:20px;font-size:11px}
 }
 </style>
 </head>
 <body>
+
 <div class="wrap">
+
 <h1>庫存統計</h1>
+
 <div class="actions">
 <button class="primary" id="copyBtn">複製文字</button>
 <button class="secondary" id="clearBtn">清除資料</button>
@@ -77,36 +181,55 @@ input:focus,select:focus{outline:2px solid #bfdbfe;border-color:#2563eb}
 
 <section class="card">
 <h2>前面三色冰箱</h2>
-<p class="note">第一排 1～7、第二排 8～14。紫米粥及仙草只顯示名稱、不計算庫存。</p>
 <div class="bucket-grid" id="frontGrid"></div>
-<p class="note">5、6、7 號三色豆花共用一個數量格。虛線空桶按 ＋ 選擇品項，每桶計算 1。</p>
+<p class="note">
+紫米粥、仙草只顯示名稱，不計算固定庫存。
+三色豆花共用一個數量格。
+虛線空桶按 ＋ 選擇品項，每桶計算 1。
+</p>
 </section>
 
 <section class="card">
 <h2>前面選料冰箱</h2>
+
 <div class="pudding">
 <div class="pudding-top">
 <span>布丁</span>
 <span id="puddingTotal">合計 0 個</span>
 </div>
+
 <div class="fields">
-<label class="field">完整盒數（12 個／盒）
-<input id="puddingBoxes" type="number" min="0" step="1" inputmode="numeric" placeholder="盒數">
+<label class="field">
+完整盒數（12 個／盒）
+<input id="puddingBoxes" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="盒數">
 </label>
-<label class="field">單個數量
-<input id="puddingSingles" type="number" min="0" step="1" inputmode="numeric" placeholder="個數">
+
+<label class="field">
+單個數量
+<input id="puddingSingles" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="個數">
 </label>
 </div>
 </div>
+
 <div class="compact-grid">
-<label class="compact">牛奶
-<input id="ingredientMilk" type="number" min="0" step="any" inputmode="decimal" placeholder="數量">
+<label class="compact">
+牛奶
+<input id="ingredientMilk" type="number"
+ min="0" step="any" inputmode="decimal" placeholder="數量">
 </label>
-<label class="compact">杏仁豆腐
-<input id="ingredientAlmond" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+杏仁豆腐
+<input id="ingredientAlmond" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
-<label class="compact">黑糖粉粿
-<input id="ingredientJelly" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+黑糖粉粿
+<input id="ingredientJelly" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
 </div>
 </section>
@@ -114,42 +237,87 @@ input:focus,select:focus{outline:2px solid #bfdbfe;border-color:#2563eb}
 <section class="card">
 <h2>小白板</h2>
 <div class="two-grid">
-<label class="compact">杏仁豆腐
-<input id="whiteAlmond" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+杏仁豆腐
+<input id="whiteAlmond" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
-<label class="compact">豆花
-<input id="whiteTofu" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+豆花
+<input id="whiteTofu" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
+
 </div>
 </section>
 
 <section class="card">
 <h2>後面水冰箱</h2>
-<p class="note">14 個桶位，每桶計算 1。三色豆花占同一排連續 3 個桶位，但總數只計算 1。</p>
 <div class="bucket-grid" id="waterGrid"></div>
 </section>
 
 <section class="card">
 <h2>後面廚房冰箱</h2>
 <div class="compact-grid">
-<label class="compact">牛奶
-<input id="kitchenMilk" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+牛奶
+<input id="kitchenMilk" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
-<label class="compact">粉粿
-<input id="kitchenJelly" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+粉粿
+<input id="kitchenJelly" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
-<label class="compact">杏仁豆腐
-<input id="kitchenAlmond" type="number" min="0" step="1" inputmode="numeric" placeholder="數量">
+
+<label class="compact">
+杏仁豆腐
+<input id="kitchenAlmond" type="number"
+ min="0" step="1" inputmode="numeric" placeholder="數量">
 </label>
+
 </div>
 </section>
 
 <section class="card">
 <h2>廚房瓦斯爐</h2>
-<p class="note">糖水有庫存計算 2，沒有則計算 0。</p>
+<p class="note">糖水有庫存計算 2，沒有計算 0。</p>
 <div class="stove">
-<label><input type="radio" name="stove" value="yes">有（＋2）</label>
-<label><input type="radio" name="stove" value="no" checked>沒有（＋0）</label>
+<label>
+<input type="radio" name="stove" value="yes">
+有（＋2）
+</label>
+<label>
+<input type="radio" name="stove" value="no" checked>
+沒有（＋0）
+</label>
+</div>
+</section>
+
+<section class="card">
+<h2>薑汁</h2>
+<label class="compact">
+薑汁數量（可輸入小數）
+<input id="ginger" type="number"
+ min="0" step="any" inputmode="decimal" placeholder="輸入數量">
+</label>
+</section>
+
+<section class="card">
+<h2>收店確認</h2>
+
+<div class="check-row">
+<strong>確認加熱器關了</strong>
+<button class="check-btn" id="heaterBtn">未確認</button>
+</div>
+
+<div class="check-row">
+<strong>窗戶是否關了</strong>
+<button class="check-btn" id="windowBtn">未確認</button>
 </div>
 </section>
 
@@ -164,7 +332,12 @@ input:focus,select:focus{outline:2px solid #bfdbfe;border-color:#2563eb}
 </section>
 
 <div id="message" class="message"></div>
-<p class="note">庫存與冰箱溫度會自動儲存在目前裝置的瀏覽器中。不同裝置不會自動同步。</p>
+
+<p class="note">
+資料會自動儲存在目前裝置的瀏覽器中。
+不同裝置不會自動同步。
+</p>
+
 </div>
 
 <div class="modal" id="picker">
@@ -182,435 +355,761 @@ input:focus,select:focus{outline:2px solid #bfdbfe;border-color:#2563eb}
 <script>
 "use strict";
 
-const KEY="dachun_stock_complete_v1";
-const FRONT_OPTIONS=["杏仁茶","紫米粥","豆漿","仙草","愛玉","豆花","糖水"];
-const WATER_OPTIONS=["杏仁茶","紫米粥","豆漿","三色豆花","仙草","愛玉","豆花","糖水"];
+const KEY="dachun_stock_complete_v2";
+
+const FRONT_OPTIONS=[
+ "杏仁茶","紫米粥","豆漿","仙草",
+ "愛玉","豆花","糖水"
+];
+
+const WATER_OPTIONS=[
+ "杏仁茶","紫米粥","豆漿","三色豆花",
+ "仙草","愛玉","豆花","糖水"
+];
+
 const FRONT_NAMES={
-1:"杏仁茶",2:"紫米粥",4:"豆漿",
-5:"三色豆花",6:"三色豆花",7:"三色豆花",
-8:"仙草",12:"愛玉",13:"豆花",14:"糖水"
+ 1:"杏仁茶",
+ 2:"紫米粥",
+ 4:"豆漿",
+ 5:"三色豆花",
+ 6:"三色豆花",
+ 7:"三色豆花",
+ 8:"仙草",
+ 12:"愛玉",
+ 13:"豆花",
+ 14:"糖水"
 };
+
 const EXTRA=[3,9,10,11];
+
 const FIELDS=[
-"puddingBoxes","puddingSingles",
-"ingredientMilk","ingredientAlmond","ingredientJelly",
-"whiteAlmond","whiteTofu",
-"kitchenMilk","kitchenJelly","kitchenAlmond"
+ "puddingBoxes",
+ "puddingSingles",
+ "ingredientMilk",
+ "ingredientAlmond",
+ "ingredientJelly",
+ "whiteAlmond",
+ "whiteTofu",
+ "kitchenMilk",
+ "kitchenJelly",
+ "kitchenAlmond",
+ "ginger"
 ];
-const DECIMAL_FIELDS=["ingredientMilk"];
+
+const DECIMAL_FIELDS=["ingredientMilk","ginger"];
+
 const FRIDGES=[
-{key:"front",name:"前面 三色冷藏冰箱",note:"檢查是否為 3°C"},
-{key:"freezer",name:"前面 冷凍小冰箱",note:"檢查是否為 -7°C"},
-{key:"water",name:"後面 水冰箱",note:"檢查是否結冰；結冰調整為 0°C，未結冰調整為 -1°C"}
+ {
+  key:"front",
+  name:"前面 三色冷藏冰箱",
+  note:"檢查是否為 3°C"
+ },
+ {
+  key:"freezer",
+  name:"前面 冷凍小冰箱",
+  note:"檢查是否為 -7°C"
+ },
+ {
+  key:"water",
+  name:"後面 水冰箱",
+  note:"檢查是否結冰；結冰調整為 0°C，未結冰調整為 -1°C"
+ }
 ];
+
 const COPY_NAMES=[
-"豆花","豆漿","三色","牛奶","布丁",
-"糖水","愛玉","杏仁豆腐","杏仁茶","粉粿",
-"紫米粥","仙草"
+ "豆花","豆漿","三色","牛奶","布丁",
+ "糖水","愛玉","杏仁豆腐","杏仁茶",
+ "粉粿","紫米粥","仙草","薑汁"
 ];
 
 function emptyState(){
-return {
-front:{},
-frontExtras:{},
-water:{},
-fields:{},
-temps:{},
-stove:"no"
-};
+ return {
+  front:{},
+  frontExtras:{},
+  water:{},
+  fields:{},
+  temps:{},
+  stove:"no",
+  checks:{heater:false,window:false}
+ };
 }
+
 let state=emptyState();
+
 try{
-const saved=JSON.parse(localStorage.getItem(KEY)||"null");
-if(saved&&typeof saved==="object"){
-state={
-front:saved.front||{},
-frontExtras:saved.frontExtras||{},
-water:saved.water||{},
-fields:saved.fields||{},
-temps:saved.temps||{},
-stove:saved.stove==="yes"?"yes":"no"
-};
-}
+ const saved=JSON.parse(localStorage.getItem(KEY)||"null");
+ if(saved&&typeof saved==="object"){
+  state={
+   front:saved.front||{},
+   frontExtras:saved.frontExtras||{},
+   water:saved.water||{},
+   fields:saved.fields||{},
+   temps:saved.temps||{},
+   stove:saved.stove==="yes"?"yes":"no",
+   checks:saved.checks||{heater:false,window:false}
+  };
+ }
 }catch(e){}
 
-function el(id){return document.getElementById(id);}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));}
-function num(v){const n=Number(v);return Number.isFinite(n)?Math.max(0,n):0;}
-function integer(v){return Math.max(0,Math.trunc(num(v)));}
-function clean(v){return Math.round((v+Number.EPSILON)*1000)/1000;}
-function add(map,name,n){map[name]=(map[name]||0)+n;}
-function normalized(name){
-if(name==="三色豆花")return "三色";
-if(name==="黑糖粉粿")return "粉粿";
-return name;
-}
-function notify(text){
-el("message").textContent=text;
-clearTimeout(window.msgTimer);
-window.msgTimer=setTimeout(()=>el("message").textContent="",3000);
+function el(id){
+ return document.getElementById(id);
 }
 
-function makeBucket(n,name,classes=""){
-const b=document.createElement("div");
-b.className="bucket "+classes;
-const number=document.createElement("span");
-number.className="num";
-number.textContent=n;
-b.append(number);
-if(name){
-const label=document.createElement("span");
-label.className="name";
-label.textContent=name;
-b.append(label);
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(state));
 }
-return b;
+
+function num(v){
+ if(v===null||v===undefined||v==="")return 0;
+ const n=Number(v);
+ return Number.isFinite(n)?Math.max(0,n):0;
+}
+
+function integer(v){
+ return Math.max(0,Math.trunc(num(v)));
+}
+
+function clean(v){
+ return Math.round((v+Number.EPSILON)*1000)/1000;
+}
+
+function add(map,name,n){
+ map[name]=(map[name]||0)+n;
+}
+
+function normalized(name){
+ if(name==="三色豆花")return "三色";
+ if(name==="黑糖粉粿")return "粉粿";
+ return name;
+}
+
+function notify(text){
+ el("message").textContent=text;
+ clearTimeout(window.msgTimer);
+ window.msgTimer=setTimeout(()=>{
+  el("message").textContent="";
+ },3000);
+}
+
+function makeBucket(name,classes=""){
+ const b=document.createElement("div");
+ b.className="bucket "+classes;
+
+ if(name){
+  const label=document.createElement("span");
+  label.className="name";
+  label.textContent=name;
+  b.append(label);
+ }
+ return b;
 }
 
 function putCount(b,text){
-const s=document.createElement("span");
-s.className="count";
-s.textContent=text;
-b.append(s);
+ const s=document.createElement("span");
+ s.className="count";
+ s.textContent=text;
+ b.append(s);
 }
+
 function putRemove(b,callback){
-const btn=document.createElement("button");
-btn.className="remove";
-btn.type="button";
-btn.textContent="×";
-btn.setAttribute("aria-label","移除此桶");
-btn.onclick=e=>{
-e.stopPropagation();
-callback();
-};
-b.append(btn);
+ const btn=document.createElement("button");
+ btn.className="remove";
+ btn.type="button";
+ btn.textContent="×";
+ btn.setAttribute("aria-label","移除此桶");
+ btn.onclick=e=>{
+  e.stopPropagation();
+  callback();
+ };
+ b.append(btn);
 }
+
 function putPlus(b,callback){
-const s=document.createElement("span");
-s.className="plus";
-s.textContent="+";
-b.append(s);
-b.tabIndex=0;
-b.setAttribute("role","button");
-b.onclick=callback;
-b.onkeydown=e=>{
-if(e.key==="Enter"||e.key===" "){
-e.preventDefault();
-callback();
-}
-};
+ const s=document.createElement("span");
+ s.className="plus";
+ s.textContent="+";
+ b.append(s);
+
+ b.tabIndex=0;
+ b.setAttribute("role","button");
+ b.onclick=callback;
+
+ b.onkeydown=e=>{
+  if(e.key==="Enter"||e.key===" "){
+   e.preventDefault();
+   callback();
+  }
+ };
 }
 
+/* 前面三色冰箱 */
 function renderFront(){
-const root=el("frontGrid");
-root.replaceChildren();
-for(let n=1;n<=14;n++){
-let b;
-if(EXTRA.includes(n)){
-const picked=state.frontExtras[n];
-b=makeBucket(n,picked||"",picked?"filled":"empty");
-if(picked){
-putCount(b,"× 1");
-putRemove(b,()=>{
-delete state.frontExtras[n];
-save();renderFront();renderTotals();
-});
-}else putPlus(b,()=>openPicker("front",n));
-}else{
-b=makeBucket(n,FRONT_NAMES[n],
-(n===5||n===6||n===7)?"tricolor":(n===2||n===8)?"fixed":"");
-if(n===2||n===8){
-// 只顯示名稱，不列入庫存
-}else if(n===6||n===7){
-putCount(b,"共用");
-}else{
-const input=document.createElement("input");
-input.type="number";
-input.min="0";
-input.step="any";
-input.inputMode="decimal";
-input.placeholder="0";
-input.value=state.front[n]??"";
-input.setAttribute("aria-label",`${n}號${FRONT_NAMES[n]}數量`);
-input.oninput=()=>{
-state.front[n]=input.value;
-save();renderTotals();
-};
-b.append(input);
-}
-}
-root.append(b);
-}
+ const root=el("frontGrid");
+ root.replaceChildren();
+
+ for(let n=1;n<=14;n++){
+  let b;
+
+  if(EXTRA.includes(n)){
+   const picked=state.frontExtras[n];
+
+   b=makeBucket(
+    picked||"",
+    picked?"filled":"empty"
+   );
+
+   if(picked){
+    putCount(b,"× 1");
+
+    putRemove(b,()=>{
+     delete state.frontExtras[n];
+     save();
+     renderFront();
+     renderTotals();
+    });
+   }else{
+    putPlus(b,()=>openPicker("front",n));
+   }
+
+  }else{
+   b=makeBucket(
+    FRONT_NAMES[n],
+    [5,6,7].includes(n)
+     ?"tricolor"
+     :[2,8].includes(n)?"fixed":""
+   );
+
+   if(n===2||n===8){
+    // 紫米粥、仙草只顯示，不計算
+   }else if(n===6||n===7){
+    putCount(b,"共用");
+   }else{
+    const input=document.createElement("input");
+    input.type="number";
+    input.min="0";
+    input.step="any";
+    input.inputMode="decimal";
+    input.placeholder="0";
+    input.value=state.front[n]??"";
+
+    input.setAttribute(
+     "aria-label",
+     `${n}號${FRONT_NAMES[n]}數量`
+    );
+
+    input.oninput=()=>{
+     state.front[n]=input.value;
+     save();
+     renderTotals();
+    };
+
+    b.append(input);
+   }
+  }
+  root.append(b);
+ }
 }
 
+/* 水冰箱占用位置 */
 function waterSlots(){
-const slots={};
-const entries=Object.entries(state.water)
-.sort((a,b)=>Number(a[0])-Number(b[0]));
-for(const [key,name] of entries){
-const n=Number(key);
-if(!Number.isInteger(n)||n<1||n>14||!WATER_OPTIONS.includes(name))continue;
-const size=name==="三色豆花"?3:1;
-if(size===3&&(n+2>14||Math.floor((n-1)/7)!==Math.floor((n+1)/7)))continue;
-const positions=Array.from({length:size},(_,i)=>n+i);
-if(positions.some(p=>slots[p]))continue;
-positions.forEach((p,i)=>slots[p]={name,anchor:n,part:i});
-}
-return slots;
+ const slots={};
+
+ const entries=Object.entries(state.water)
+ .sort((a,b)=>Number(a[0])-Number(b[0]));
+
+ for(const [key,name] of entries){
+  const n=Number(key);
+
+  if(!Number.isInteger(n)||n<1||n>14)continue;
+  if(!WATER_OPTIONS.includes(name))continue;
+
+  const size=name==="三色豆花"?3:1;
+
+  if(size===3){
+   if(n+2>14)continue;
+   if(
+    Math.floor((n-1)/7)!==
+    Math.floor((n+1)/7)
+   )continue;
+  }
+
+  const positions=Array.from(
+   {length:size},(_,i)=>n+i
+  );
+
+  if(positions.some(p=>slots[p]))continue;
+
+  positions.forEach((p,i)=>{
+   slots[p]={name,anchor:n,part:i};
+  });
+ }
+ return slots;
 }
 
 function canTriple(n){
-const slots=waterSlots();
-if(n+2>14)return false;
-if(Math.floor((n-1)/7)!==Math.floor((n+1)/7))return false;
-return [n,n+1,n+2].every(i=>!slots[i]);
+ const slots=waterSlots();
+
+ if(n+2>14)return false;
+
+ if(
+  Math.floor((n-1)/7)!==
+  Math.floor((n+1)/7)
+ )return false;
+
+ return [n,n+1,n+2].every(i=>!slots[i]);
 }
 
+/* 水冰箱 */
 function renderWater(){
-const root=el("waterGrid");
-root.replaceChildren();
-const slots=waterSlots();
-for(let n=1;n<=14;n++){
-const slot=slots[n];
-let b;
-if(slot){
-b=makeBucket(n,slot.name,slot.name==="三色豆花"?"tricolor":"filled");
-putCount(b,slot.name==="三色豆花"&&slot.part!==0?"同組":"× 1");
-if(slot.part===0){
-putRemove(b,()=>{
-delete state.water[slot.anchor];
-save();renderWater();renderTotals();
-});
-}
-}else{
-b=makeBucket(n,"","empty");
-putPlus(b,()=>openPicker("water",n));
-}
-root.append(b);
-}
+ const root=el("waterGrid");
+ root.replaceChildren();
+
+ const slots=waterSlots();
+
+ for(let n=1;n<=14;n++){
+  const slot=slots[n];
+  let b;
+
+  if(slot){
+   b=makeBucket(
+    slot.name,
+    slot.name==="三色豆花"?"tricolor":"filled"
+   );
+
+   putCount(
+    b,
+    slot.name==="三色豆花"&&slot.part!==0
+     ?"同組":"× 1"
+   );
+
+   if(slot.part===0){
+    putRemove(b,()=>{
+     delete state.water[slot.anchor];
+     save();
+     renderWater();
+     renderTotals();
+    });
+   }
+
+  }else{
+   b=makeBucket("","empty");
+   putPlus(b,()=>openPicker("water",n));
+  }
+
+  root.append(b);
+ }
 }
 
+/* 選擇桶內品項 */
 let pickerTarget=null;
+
 function openPicker(type,n){
-pickerTarget={type,n};
-const options=type==="front"?FRONT_OPTIONS:WATER_OPTIONS;
-el("pickerTitle").textContent=(type==="front"?"三色冰箱":"水冰箱")+` 第 ${n} 號`;
-const choice=el("pickerChoice");
-choice.replaceChildren();
-options.forEach(name=>{
-const opt=document.createElement("option");
-opt.value=name;
-opt.textContent=name;
-if(type==="water"&&name==="三色豆花"&&!canTriple(n))opt.disabled=true;
-choice.append(opt);
-});
-el("pickerHint").textContent=type==="water"
-?(canTriple(n)?"三色豆花占連續 3 格，只計算 1。":"此位置無法放三色豆花，需同排連續 3 個空格。")
-:"選入的品項每桶計算 1。";
-el("picker").classList.add("open");
+ pickerTarget={type,n};
+
+ const options=type==="front"
+  ?FRONT_OPTIONS:WATER_OPTIONS;
+
+ el("pickerTitle").textContent=
+  (type==="front"?"三色冰箱":"水冰箱")
+  +` 第 ${n} 個位置`;
+
+ const choice=el("pickerChoice");
+ choice.replaceChildren();
+
+ options.forEach(name=>{
+  const opt=document.createElement("option");
+  opt.value=name;
+  opt.textContent=name;
+
+  if(
+   type==="water"&&
+   name==="三色豆花"&&
+   !canTriple(n)
+  ){
+   opt.disabled=true;
+  }
+
+  choice.append(opt);
+ });
+
+ el("pickerHint").textContent=
+  type==="water"
+  ?"一般品項計算 1。三色豆花占連續 3 格，只計算 1。"
+  :"選入的品項每桶計算 1。";
+
+ el("picker").classList.add("open");
 }
+
 function closePicker(){
-pickerTarget=null;
-el("picker").classList.remove("open");
+ pickerTarget=null;
+ el("picker").classList.remove("open");
 }
+
 el("pickerCancel").onclick=closePicker;
+
 el("picker").onclick=e=>{
-if(e.target===el("picker"))closePicker();
+ if(e.target===el("picker"))closePicker();
 };
+
 el("pickerConfirm").onclick=()=>{
-if(!pickerTarget)return;
-const {type,n}=pickerTarget;
-const name=el("pickerChoice").value;
-if(type==="front"){
-if(!EXTRA.includes(n)||!FRONT_OPTIONS.includes(name))return;
-state.frontExtras[n]=name;
-renderFront();
-}else{
-if(!WATER_OPTIONS.includes(name))return;
-if(waterSlots()[n])return;
-if(name==="三色豆花"&&!canTriple(n)){
-alert("必須有同一排連續 3 個空桶。");
-return;
-}
-state.water[n]=name;
-renderWater();
-}
-save();
-renderTotals();
-closePicker();
+ if(!pickerTarget)return;
+
+ const {type,n}=pickerTarget;
+ const name=el("pickerChoice").value;
+
+ if(type==="front"){
+  if(!EXTRA.includes(n))return;
+  if(!FRONT_OPTIONS.includes(name))return;
+
+  state.frontExtras[n]=name;
+  renderFront();
+
+ }else{
+  if(!WATER_OPTIONS.includes(name))return;
+  if(waterSlots()[n])return;
+
+  if(name==="三色豆花"&&!canTriple(n)){
+   alert("此位置需要同一排連續 3 個空桶。");
+   return;
+  }
+
+  state.water[n]=name;
+  renderWater();
+ }
+
+ save();
+ renderTotals();
+ closePicker();
 };
 
+/* 一般庫存輸入 */
 function renderFields(){
-FIELDS.forEach(id=>{
-const input=el(id);
-input.value=state.fields[id]??"";
-input.addEventListener("input",()=>{
-let value=input.value;
-if(value!==""&&!DECIMAL_FIELDS.includes(id)){
-const n=Number(value);
-if(Number.isFinite(n)){
-value=String(Math.max(0,Math.trunc(n)));
-input.value=value;
-}
-}
-state.fields[id]=value;
-save();
-renderTotals();
-});
-});
-document.querySelectorAll('input[name="stove"]').forEach(input=>{
-input.checked=input.value===state.stove;
-input.onchange=()=>{
-if(input.checked){
-state.stove=input.value;
-save();renderTotals();
-}
-};
-});
+ FIELDS.forEach(id=>{
+  const input=el(id);
+  input.value=state.fields[id]??"";
+
+  input.addEventListener("input",()=>{
+   let value=input.value;
+
+   if(value!==""&&!DECIMAL_FIELDS.includes(id)){
+    const n=Number(value);
+
+    if(Number.isFinite(n)){
+     value=String(Math.max(0,Math.trunc(n)));
+     input.value=value;
+    }
+   }
+
+   state.fields[id]=value;
+   save();
+   renderTotals();
+  });
+ });
+
+ document.querySelectorAll(
+  'input[name="stove"]'
+ ).forEach(input=>{
+  input.checked=input.value===state.stove;
+
+  input.onchange=()=>{
+   if(input.checked){
+    state.stove=input.value;
+    save();
+    renderTotals();
+   }
+  };
+ });
 }
 
+/* 收店確認按鈕 */
+function renderChecks(){
+ const checks=[
+  ["heater","heaterBtn"],
+  ["window","windowBtn"]
+ ];
+
+ checks.forEach(([key,id])=>{
+  const btn=el(id);
+
+  function paint(){
+   const yes=!!state.checks[key];
+   btn.textContent=yes?"✓ 是":"未確認";
+   btn.classList.toggle("yes",yes);
+  }
+
+  btn.onclick=()=>{
+   state.checks[key]=!state.checks[key];
+   save();
+   paint();
+  };
+
+  paint();
+ });
+}
+
+/* 冰箱溫度 */
 function renderTemps(){
-const root=el("temperatures");
-root.replaceChildren();
-FRIDGES.forEach(f=>{
-const row=document.createElement("div");
-row.className="temp-row";
-const left=document.createElement("div");
-const name=document.createElement("div");
-name.className="temp-name";
-name.textContent=f.name;
-const note=document.createElement("div");
-note.className="temp-note";
-note.textContent="（"+f.note+"）";
-left.append(name,note);
-const right=document.createElement("div");
-right.className="temp-right";
-const input=document.createElement("input");
-input.type="number";
-input.step="0.1";
-input.min="-99";
-input.max="99";
-input.placeholder="0";
-input.value=state.temps[f.key]??"";
-input.oninput=()=>{
-state.temps[f.key]=input.value;
-save();
-};
-const degree=document.createElement("span");
-degree.textContent="°C";
-right.append(input,degree);
-row.append(left,right);
-root.append(row);
-});
+ const root=el("temperatures");
+ root.replaceChildren();
+
+ FRIDGES.forEach(f=>{
+  const row=document.createElement("div");
+  row.className="temp-row";
+
+  const left=document.createElement("div");
+
+  const name=document.createElement("div");
+  name.className="temp-name";
+  name.textContent=f.name;
+
+  const note=document.createElement("div");
+  note.className="temp-note";
+  note.textContent="（"+f.note+"）";
+
+  left.append(name,note);
+
+  const right=document.createElement("div");
+  right.className="temp-right";
+
+  const input=document.createElement("input");
+  input.type="number";
+  input.step="0.1";
+  input.min="-99";
+  input.max="99";
+  input.placeholder="0";
+  input.value=state.temps[f.key]??"";
+
+  input.oninput=()=>{
+   state.temps[f.key]=input.value;
+   save();
+  };
+
+  const degree=document.createElement("span");
+  degree.textContent="°C";
+
+  right.append(input,degree);
+  row.append(left,right);
+  root.append(row);
+ });
 }
 
+/* 所有商品統計 */
 function totals(){
-const out={};
-[1,4,5,12,13,14].forEach(n=>{
-add(out,normalized(FRONT_NAMES[n]),num(state.front[n]));
-});
-EXTRA.forEach(n=>{
-const name=state.frontExtras[n];
-if(FRONT_OPTIONS.includes(name))add(out,normalized(name),1);
-});
-const f=state.fields;
-add(out,"布丁",integer(f.puddingBoxes)*12+integer(f.puddingSingles));
-add(out,"牛奶",num(f.ingredientMilk));
-add(out,"杏仁豆腐",integer(f.ingredientAlmond));
-add(out,"粉粿",integer(f.ingredientJelly));
-add(out,"杏仁豆腐",integer(f.whiteAlmond));
-add(out,"豆花",integer(f.whiteTofu));
-add(out,"牛奶",integer(f.kitchenMilk));
-add(out,"粉粿",integer(f.kitchenJelly));
-add(out,"杏仁豆腐",integer(f.kitchenAlmond));
-if(state.stove==="yes")add(out,"糖水",2);
-const slots=waterSlots();
-Object.entries(state.water).forEach(([key,name])=>{
-const n=Number(key);
-if(slots[n]&&slots[n].anchor===n&&slots[n].name===name){
-add(out,normalized(name),1);
-}
-});
-return out;
+ const out={};
+
+ // 前面三色冰箱
+ [1,4,5,12,13,14].forEach(n=>{
+  add(
+   out,
+   normalized(FRONT_NAMES[n]),
+   num(state.front[n])
+  );
+ });
+
+ // 三色冰箱新增桶位
+ EXTRA.forEach(n=>{
+  const name=state.frontExtras[n];
+
+  if(FRONT_OPTIONS.includes(name)){
+   add(out,normalized(name),1);
+  }
+ });
+
+ const f=state.fields;
+
+ // 布丁
+ add(
+  out,"布丁",
+  integer(f.puddingBoxes)*12+
+  integer(f.puddingSingles)
+ );
+
+ // 選料冰箱
+ add(out,"牛奶",num(f.ingredientMilk));
+ add(out,"杏仁豆腐",integer(f.ingredientAlmond));
+ add(out,"粉粿",integer(f.ingredientJelly));
+
+ // 小白板
+ add(out,"杏仁豆腐",integer(f.whiteAlmond));
+ add(out,"豆花",integer(f.whiteTofu));
+
+ // 廚房冰箱
+ add(out,"牛奶",integer(f.kitchenMilk));
+ add(out,"粉粿",integer(f.kitchenJelly));
+ add(out,"杏仁豆腐",integer(f.kitchenAlmond));
+
+ // 瓦斯爐
+ if(state.stove==="yes"){
+  add(out,"糖水",2);
+ }
+
+ // 薑汁
+ add(out,"薑汁",num(f.ginger));
+
+ // 水冰箱
+ const slots=waterSlots();
+
+ Object.entries(state.water).forEach(([key,name])=>{
+  const n=Number(key);
+
+  if(
+   slots[n]&&
+   slots[n].anchor===n&&
+   slots[n].name===name
+  ){
+   add(out,normalized(name),1);
+  }
+ });
+
+ return out;
 }
 
+/* 顯示合計 */
 function renderTotals(){
-const map=totals();
-const pudding=integer(state.fields.puddingBoxes)*12+integer(state.fields.puddingSingles);
-el("puddingTotal").textContent=`合計 ${pudding} 個`;
-const root=el("totals");
-root.replaceChildren();
-COPY_NAMES.forEach(name=>{
-const value=clean(map[name]||0);
-if((name==="紫米粥"||name==="仙草")&&value===0)return;
-const row=document.createElement("div");
-row.className="total-row";
-const left=document.createElement("span");
-left.textContent=name;
-const right=document.createElement("strong");
-right.textContent=value;
-row.append(left,right);
-root.append(row);
-});
+ const map=totals();
+
+ const pudding=
+  integer(state.fields.puddingBoxes)*12+
+  integer(state.fields.puddingSingles);
+
+ el("puddingTotal").textContent=
+  `合計 ${pudding} 個`;
+
+ const root=el("totals");
+ root.replaceChildren();
+
+ COPY_NAMES.forEach(name=>{
+  const value=clean(map[name]||0);
+
+  // 固定顯示的紫米粥、仙草不算庫存
+  if(
+   (name==="紫米粥"||name==="仙草")&&
+   value===0
+  )return;
+
+  const row=document.createElement("div");
+  row.className="total-row";
+
+  const left=document.createElement("span");
+  left.textContent=name;
+
+  const right=document.createElement("strong");
+  right.textContent=value;
+
+  row.append(left,right);
+  root.append(row);
+ });
 }
 
+/* 複製文字 */
 function makeCopyText(){
-const map=totals();
-const lines=[];
-COPY_NAMES.forEach(name=>{
-const value=clean(map[name]||0);
-if((name==="紫米粥"||name==="仙草")&&value===0)return;
-lines.push(`${name}：${value}`);
-});
-lines.push("");
-lines.push("冰箱溫度：");
-FRIDGES.forEach(f=>{
-const value=state.temps[f.key]??"";
-lines.push(`${f.name}：${value===""?"":value+"°C"}`);
-});
-return lines.join("\n");
+ const map=totals();
+ const lines=[];
+
+ COPY_NAMES.forEach(name=>{
+  const value=clean(map[name]||0);
+
+  if(
+   (name==="紫米粥"||name==="仙草")&&
+   value===0
+  )return;
+
+  lines.push(`${name}：${value}`);
+ });
+
+ lines.push("");
+ lines.push("冰箱溫度：");
+
+ FRIDGES.forEach(f=>{
+  const value=state.temps[f.key]??"";
+
+  lines.push(
+   `${f.name}：${value===""?"":value+"°C"}`
+  );
+ });
+
+ lines.push("");
+ lines.push("收店確認：");
+
+ lines.push(
+  "確認加熱器關了："+(
+   state.checks.heater?"是":"未確認"
+  )
+ );
+
+ lines.push(
+  "窗戶是否關了："+(
+   state.checks.window?"是":"未確認"
+  )
+ );
+
+ return lines.join("\n");
 }
 
+/* 複製到剪貼簿 */
 async function copyText(){
-const text=makeCopyText();
-try{
-await navigator.clipboard.writeText(text);
-notify("已複製，可以直接貼到 LINE。");
-}catch(e){
-const area=document.createElement("textarea");
-area.value=text;
-document.body.append(area);
-area.select();
-const ok=document.execCommand("copy");
-area.remove();
-if(ok)notify("已複製，可以直接貼到 LINE。");
-else{
-alert("自動複製失敗，請手動選取文字。");
-}
-}
+ const text=makeCopyText();
+
+ try{
+  await navigator.clipboard.writeText(text);
+  notify("已複製，可以直接貼到 LINE。");
+
+ }catch(e){
+  const area=document.createElement("textarea");
+  area.value=text;
+
+  document.body.append(area);
+  area.select();
+
+  const ok=document.execCommand("copy");
+  area.remove();
+
+  if(ok){
+   notify("已複製，可以直接貼到 LINE。");
+  }else{
+   alert("自動複製失敗，請手動選取文字。");
+  }
+ }
 }
 
+/* 清除資料 */
 function clearData(){
-if(!confirm("確定要清除全部庫存數量、桶位品項與冰箱溫度嗎？"))return;
-state=emptyState();
-localStorage.removeItem(KEY);
-renderFront();
-renderWater();
-FIELDS.forEach(id=>el(id).value="");
-document.querySelector('input[name="stove"][value="no"]').checked=true;
-renderTemps();
-renderTotals();
-notify("資料已清除。");
+ if(!confirm(
+  "確定要清除全部庫存數量、桶位品項、冰箱溫度與收店確認嗎？"
+ ))return;
+
+ state=emptyState();
+ localStorage.removeItem(KEY);
+
+ renderFront();
+ renderWater();
+
+ FIELDS.forEach(id=>{
+  el(id).value="";
+ });
+
+ document.querySelector(
+  'input[name="stove"][value="no"]'
+ ).checked=true;
+
+ renderChecks();
+ renderTemps();
+ renderTotals();
+
+ notify("資料已清除。");
 }
 
 el("copyBtn").onclick=copyText;
 el("clearBtn").onclick=clearData;
 
+/* 啟動 */
 renderFront();
 renderWater();
 renderFields();
+renderChecks();
 renderTemps();
 renderTotals();
+
 </script>
 </body>
 </html>
